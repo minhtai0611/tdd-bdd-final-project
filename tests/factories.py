@@ -1,9 +1,19 @@
+"""
+Factory module for creating fake product instances for testing.
+"""
+
+# pylint: disable=too-few-public-methods
+
+import factory
+from factory.fuzzy import FuzzyChoice, FuzzyDecimal
+from service.models import Category, Product
+
+
 class ProductFactory(factory.Factory):
     """Creates fake products for testing"""
 
     class Meta:
         """Maps factory to data model"""
-
         model = Product
 
     id = factory.Sequence(lambda n: n)
@@ -19,7 +29,7 @@ class ProductFactory(factory.Factory):
             "Ford",
             "Chevy",
             "Hammer",
-            "Wrench"
+            "Wrench",
         ]
     )
     description = factory.Faker("text")

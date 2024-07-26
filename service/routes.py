@@ -18,12 +18,13 @@
 """
 Product Store Service with UI
 """
-from flask import jsonify, request, abort
 from flask import url_for  # noqa: F401 pylint: disable=unused-import
-from service.models import Product
+from flask import abort, jsonify, request
 from service.common import status  # HTTP Status Codes
+from service.models import Category, Product
+
 from . import app
-from service.models import Product, Category
+
 
 ######################################################################
 # H E A L T H   C H E C K
@@ -89,8 +90,8 @@ def create_products():
     #
     # Uncomment this line of code once you implement READ A PRODUCT
     #
-    # location_url = url_for("get_products", product_id=product.id, _external=True)
-    location_url = "/"  # delete once READ is implemented
+    location_url = url_for("get_products", product_id=product.id, _external=True)
+    # location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -128,6 +129,7 @@ def list_products():
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
 
+
 ######################################################################
 # READ A PRODUCT
 ######################################################################
@@ -142,10 +144,13 @@ def get_products(product_id):
 
     product = Product.find(product_id)
     if not product:
-        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
 
     app.logger.info("Returning product: %s", product.name)
     return product.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 # UPDATE AN EXISTING PRODUCT
@@ -162,12 +167,15 @@ def update_products(product_id):
 
     product = Product.find(product_id)
     if not product:
-        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
 
     product.deserialize(request.get_json())
     product.id = product_id
     product.update()
     return product.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 # DELETE A PRODUCT
@@ -181,8 +189,7 @@ def delete_products(product_id):
     """
     app.logger.info("Request to Delete a product with id [%s]", product_id)
 
-    product = Product.find(product_id)
-    if product:
+    if product := Product.find(product_id):
         product.delete()
 
     return "", status.HTTP_204_NO_CONTENT
